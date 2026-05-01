@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Age Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f0e8;
+      --card: #fffdf8;
+      --border: #e0d8cc;
+      --accent: #c0392b;
+      --accent2: #e67e22;
+      --text: #1a1208;
+      --muted: #8a7d6b;
+      --gold: #d4a017;
+      --shadow: rgba(80,50,20,0.10);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(212,160,23,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(192,57,43,0.08) 0%, transparent 50%);
+    }
+
+    .wrapper { width: 100%; max-width: 540px; }
+
+    header { text-align: center; margin-bottom: 32px; }
+
+    .header-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+
+    header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.2rem, 7vw, 3rem);
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    header h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p { color: var(--muted); margin-top: 10px; font-size: 0.95rem; font-weight: 300; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 4px 6px var(--shadow), 0 24px 48px rgba(80,50,20,0.07);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+    }
+
+    .inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+    .input-group { display: flex; flex-direction: column; gap: 7px; }
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    input[type="date"] {
+      width: 100%;
+      padding: 13px 14px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    input[type="date"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+
+    .hint {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .hint::before, .hint::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+    /* Placeholder */
+    #placeholder {
+      text-align: center;
+      padding: 20px 0 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .placeholder-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; opacity: 0.5; }
+
+    /* Age display */
+    .age-display {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 6px;
+    }
+
+    .age-years {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(4rem, 18vw, 6rem);
+      line-height: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .age-unit {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--muted);
+      margin-left: 10px;
+      padding-bottom: 8px;
+    }
+
+    .age-sub {
+      text-align: center;
+      font-size: 1rem;
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: 20px;
+      min-height: 1.4em;
+    }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+    .stats-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+    .stat-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .stat-box:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .stat-val {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.45rem;
+      color: var(--text);
+    }
+
+    .stat-lbl { font-size: 0.7rem; color: var(--muted); margin-top: 3px; font-weight: 500; letter-spacing: 0.3px; }
+
+    /* Birthday */
+    .bday-box {
+      background: linear-gradient(135deg, rgba(212,160,23,0.1), rgba(192,57,43,0.08));
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .bday-icon { font-size: 1.5rem; }
+    .bday-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); margin: 6px 0 4px; }
+    .bday-text { font-size: 0.9rem; font-weight: 600; color: var(--text); min-height: 1.3em; }
+    .bday-sub { font-size: 0.78rem; color: var(--muted); margin-top: 3px; min-height: 1.2em; }
+
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+    .flash { animation: pulse 0.3s ease; }
+
+    footer { text-align: center; margin-top: 20px; color: var(--muted); font-size: 0.75rem; }
+
+    @media (max-width: 420px) {
+      .inputs-row { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .card { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="header-badge">✦ Live Calculation</div>
+    <h1>Age <span>Calculator</span></h1>
+    <p>Enter your date of birth — results appear instantly</p>
+  </header>
+
+  <div class="card">
+    <div class="inputs-row">
+      <div class="input-group">
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob"/>
+      </div>
+      <div class="input-group">
+        <label for="target">Calculate As Of</label>
+        <input type="date" id="target"/>
+      </div>
+    </div>
+    <div class="hint">⚡ results update live as you type</div>
+
+    <hr class="divider"/>
+
+    <div id="placeholder">
+      <span class="placeholder-icon">🎂</span>
+      Select your date of birth above to see your age instantly.
+    </div>
+
+    <div id="ageContent" style="display:none;">
+      <div class="age-display">
+        <div class="age-years" id="ageYears">0</div>
+        <div class="age-unit">yrs</div>
+      </div>
+      <div class="age-sub" id="ageSub"></div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val" id="totalMonths">—</div>
+          <div class="stat-lbl">Total Months</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="totalWeeks">—</div>
+          <div class="stat-lbl">Total Weeks</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="totalDays">—</div>
+          <div class="stat-lbl">Total Days</div>
+        </div>
+      </div>
+
+      <div class="stats-row2">
+        <div class="stat-box">
+          <div class="stat-val" id="totalHours">—</div>
+          <div class="stat-lbl">Total Hours (approx.)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="totalMins">—</div>
+          <div class="stat-lbl">Total Minutes (approx.)</div>
+        </div>
+      </div>
+
+      <div class="bday-box">
+        <div class="bday-icon" id="bdayIcon">🎁</div>
+        <div class="bday-title">Next Birthday</div>
+        <div class="bday-text" id="bdayText">—</div>
+        <div class="bday-sub" id="bdaySub">—</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Built with HTML · CSS · JavaScript &nbsp;•&nbsp; Host free on GitHub Pages or Netlify</footer>
+</div>
+
+<script>
+  const todayStr = new Date().toISOString().split('T')[0];
+  const dobInput = document.getElementById('dob');
+  const targetInput = document.getElementById('target');
+
+  targetInput.value = todayStr;
+  targetInput.max = todayStr;
+  dobInput.max = todayStr;
+
+  function fmt(n) { return Number(n).toLocaleString('en-US'); }
+
+  function ordinal(n) {
+    const s = ['th','st','nd','rd'], v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
+  }
+
+  function flash(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  }
+
+  function calculate() {
+    const dobVal = dobInput.value;
+    const targetVal = targetInput.value || todayStr;
+    const placeholder = document.getElementById('placeholder');
+    const ageContent = document.getElementById('ageContent');
+
+    if (!dobVal) {
+      placeholder.innerHTML = '<span class="placeholder-icon">🎂</span>Select your date of birth above to see your age instantly.';
+      placeholder.style.display = 'block';
+      ageContent.style.display = 'none';
+      return;
+    }
+
+    const dob = new Date(dobVal);
+    const target = new Date(targetVal);
+
+    if (dob > target) {
+      placeholder.innerHTML = '<span class="placeholder-icon">⚠️</span>Date of birth cannot be after the target date.';
+      placeholder.style.display = 'block';
+      ageContent.style.display = 'none';
+      return;
+    }
+
+    placeholder.style.display = 'none';
+    ageContent.style.display = 'block';
+
+    // Exact age
+    let years = target.getFullYear() - dob.getFullYear();
+    let months = target.getMonth() - dob.getMonth();
+    let days = target.getDate() - dob.getDate();
+
+    if (days < 0) {
+      months--;
+      days += new Date(target.getFullYear(), target.getMonth(), 0).getDate();
+    }
+    if (months < 0) { years--; months += 12; }
+
+    const diffMs = target - dob;
+    const totalDays = Math.floor(diffMs / 86400000);
+    const totalWeeks = Math.floor(totalDays / 7);
+    const totalMonths = years * 12 + months;
+    const totalHours = totalDays * 24;
+    const totalMins = totalHours * 60;
+
+    // Update values
+    document.getElementById('ageYears').textContent = years;
+    document.getElementById('ageSub').textContent =
+      `${years} year${years !== 1 ? 's' : ''}, ${months} month${months !== 1 ? 's' : ''}, ${days} day${days !== 1 ? 's' : ''} old`;
+
+    document.getElementById('totalMonths').textContent = fmt(totalMonths);
+    document.getElementById('totalWeeks').textContent = fmt(totalWeeks);
+    document.getElementById('totalDays').textContent = fmt(totalDays);
+    document.getElementById('totalHours').textContent = fmt(totalHours);
+    document.getElementById('totalMins').textContent = fmt(totalMins);
+
+    flash('ageYears');
+
+    // Next birthday
+    const isBirthday = dob.getDate() === target.getDate() && dob.getMonth() === target.getMonth();
+    let nextBday = new Date(target.getFullYear(), dob.getMonth(), dob.getDate());
+    if (nextBday <= target) nextBday.setFullYear(target.getFullYear() + 1);
+
+    const daysUntil = Math.ceil((nextBday - target) / 86400000);
+    const nextAge = years + 1;
+    const bdayDateStr = nextBday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+    if (isBirthday) {
+      document.getElementById('bdayIcon').textContent = '🎂';
+      document.getElementById('bdayText').textContent = 'Today is your Birthday!';
+      document.getElementById('bdaySub').textContent = `Happy ${ordinal(years)} Birthday! 🎉`;
+    } else {
+      document.getElementById('bdayIcon').textContent = '🎁';
+      document.getElementById('bdayText').textContent = bdayDateStr;
+      document.getElementById('bdaySub').textContent =
+        `${ordinal(nextAge)} birthday in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
+    }
+  }
+
+  dobInput.addEventListener('input', calculate);
+  dobInput.addEventListener('change', calculate);
+  targetInput.addEventListener('input', calculate);
+  targetInput.addEventListener('change', calculate);
+</script>
+</body>
+</html>
